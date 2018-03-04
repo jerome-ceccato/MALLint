@@ -1,43 +1,43 @@
-var https = require('https');
+let https = require('https');
 
-var API = {
-    res: null,
-    user: '',
-    entity: 'anime',
-    user_list: null,
-};
+function API() {
+    this.res = null;
+    this.user = '';
+    this.entity = 'anime';
+    this.user_list = null;
+}
 
-API.run = (res, params) => {
-    API.res = res;
+API.prototype.run = function(res, params) {
+    this.res = res;
 
-    if (!API.validateParams(params)) {
-        API.error('invalid parameters')
+    if (!this.validateParams(params)) {
+        this.error('invalid parameters')
     }
     else {
-        API.loadList(() => {
-            let analyzer = require('./analyzer');
-            API.res.json(analyzer.run(API.user, API.entity, API.user_list));
+        this.loadList(() => {
+            let analyzer = new (require('./analyzer'))(this.user, this.entity);
+            this.res.json(analyzer.run(this.user_list));
         });
     }
 };
 
-API.loadList = (success) => {
+API.prototype.loadList = function(success) {
     let options = {
         host: 'imal.iatgof.com',
-        path: `/app.php/2.2/${API.entity}list/${API.user}`
+        path: `/app.php/2.2/${this.entity}list/${this.user}`
     };
 
     let request = https.get(options, (res) => {
         let response = '';
 
-        res.on('data', function(data) {
+        res.on('data', (data) => {
             response += data;
         });
 
-        res.on('end', function() {
+        res.on('end', () => {
             let responseJSON = JSON.parse(response);
-            API.user_list = responseJSON[API.entity];
-            success(responseJSON)
+            this.user_list = responseJSON[this.entity];
+            success();
         });
     });
 
@@ -47,16 +47,16 @@ API.loadList = (success) => {
     request.end();
 };
 
-API.validateParams = (params) => {
+API.prototype.validateParams = function(params) {
     if (params.user != null) {
-        API.user = params.user;
+        this.user = params.user;
     }
     else {
         return false;
     }
 
     if (params.entity === 'anime' || params.entity === 'manga') {
-        API.entity = params.entity;
+        this.entity = params.entity;
     }
     else {
         return false;
@@ -65,8 +65,8 @@ API.validateParams = (params) => {
     return true;
 };
 
-API.error = (message) => {
-    API.res.json({'error': message});
+API.prototype.error = function(message) {
+    this.res.json({'error': message});
 };
 
 module.exports = API;

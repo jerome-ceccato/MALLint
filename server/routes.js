@@ -5,6 +5,7 @@ module.exports = app => {
 	});
 
 	app.get(`/analyze/:entity/:user`, (req, res) => {
-		require('./api').run(res, req.params);
+		let api = new (require('./api'))();
+		api.run(res, req.params);
 	});
 };

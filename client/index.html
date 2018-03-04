@@ -12,18 +12,15 @@
 			.container {
 				padding: 200px 0;
 			}
-			.funny-stuff {
-				text-align: center;
-			}
 		</style>
 	</head>
 	<!-- appController -->
 	<body ng-controller="appController">
 		<div class="container">
-			<div class="funny-stuff">
-				<span>
-					{{funnyStuff}}
-				</span>
+			<div>
+				<pre id="json">
+					{{output}}
+				</pre>
 			</div>
 		</div>
 	</body>

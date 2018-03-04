@@ -11,6 +11,6 @@ app.factory('dataServ', ['$http',($http) => {
 // App controller
 app.controller('appController', ['$scope','dataServ', ($scope, Data) => {
 	Data.get().success(resp => {
-			$scope.funnyStuff = resp;
+			$scope.output = JSON.stringify(resp, null, 2);
 		});
 }]);
