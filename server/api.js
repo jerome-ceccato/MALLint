@@ -37,7 +37,13 @@ API.prototype.loadList = function(success) {
         res.on('end', () => {
             let responseJSON = JSON.parse(response);
             this.user_list = responseJSON[this.entity];
-            success();
+
+            if (this.user_list) {
+                success();
+            }
+            else {
+                this.error('User not found or empty list');
+            }
         });
     });
 
