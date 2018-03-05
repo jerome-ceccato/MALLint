@@ -1,5 +1,5 @@
 // App
-const app = angular.module('app', []);
+const app = angular.module('app', ['angular-loading-bar']);
 
 // Service to fetch some data..
 app.factory('fetcher', ['$http', ($http) => {
@@ -11,28 +11,35 @@ app.factory('fetcher', ['$http', ($http) => {
 // App controller
 app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
 	$scope.loadData = function (entity, username) {
+	    $scope.entity = entity;
+
         Data.get(entity, username).success(resp => {
-            $scope.output = JSON.stringify(resp, null, 2);
-        });
-    };
-    
-    $scope.inputEnter = function (event) {
-        if (event.which === 13) {
-            $scope.loadData('anime', $scope.usernameInput);
-        }
-    };
-}]);
-
-app.directive('inputReturned', function () {
-    return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
-            if(event.which === 13) {
-                scope.$apply(function (){
-                    scope.$eval(attrs.myEnter);
-                });
-
-                event.preventDefault();
+            if (resp.hasOwnProperty('error')) {
+                $scope.error = resp.error;
+                $scope.data = null;
+            }
+            else {
+                $scope.error = null;
+                $scope.data = resp
             }
         });
     };
-});
+    
+    $scope.loadMALList = function () {
+        $scope.loadData('anime', $scope.usernameInput);
+    };
+
+    // Utils
+
+    $scope.getEntities = function () {
+        return $scope.data[$scope.entity];
+    };
+
+    $scope.imageURLForID = function (id) {
+        return $scope.getEntities()[id].image_url;
+    };
+
+    $scope.titleForID = function (id) {
+        return $scope.getEntities()[id].title;
+    };
+}]);
