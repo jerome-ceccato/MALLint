@@ -8,19 +8,41 @@ footer {
     padding-bottom: 3rem;
 }
 
-.cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: space-between;
+.main-container {
+    margin-top: 30px;
+    max-width: 800px;
 }
 
-.card-fixed {
-    width: 225px;
-    height: 420px;
+.report-main {
+    margin-bottom: 20px;
 }
 
-.card-img-fixed {
-    width: 225px;
-    height: 320px;
+.report-items {
+
+}
+
+.report-title {
+    margin-bottom: 10px;
+    color: black;
+    font-size: large;
+}
+
+.report-item {
+    margin-bottom: 5px;
+}
+
+.entity-image {
     object-fit: cover;
+    width: 45px;
+    height: 64px;
+}
+
+.entity-name {
+
+}
+
+.reports-summary {
+    margin-bottom: 20px;
+    font-size: larger;
+    text-align: center;
 }

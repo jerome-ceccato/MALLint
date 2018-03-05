@@ -1,65 +1,87 @@
 <!doctype html>
 <html ng-app="app">
-	<head>
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-		<!-- Load js -->
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-		<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.js'></script>
-        <script src="js/app.js"></script>
+    <!-- Load js -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script type='text/javascript'
+            src='https://cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.js'></script>
+    <script src="js/app.js"></script>
 
-		<!-- Some css -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-		<link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.css' type='text/css' media='all' />
-        <link rel="stylesheet" href="css/main.css">
+    <!-- Some css -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/angular-loading-bar/0.9.0/loading-bar.min.css'
+          type='text/css' media='all'/>
+    <link rel="stylesheet" href="css/main.css">
 
-		<title>MAL health check</title>
-	</head>
+    <title>MAL health check</title>
+</head>
 
-	<body ng-controller="appController" class="container-fluid">
+<body ng-controller="appController" class="container-fluid">
 
-    <nav class="navbar navbar-light bg-light static-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">MAL Health Check</a>
-        </div>
-    </nav>
+<nav class="navbar navbar-light bg-light static-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">MAL Health Check</a>
+    </div>
+</nav>
 
-    <header class="text-white text-center">
-        <div class="overlay"></div>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-                    <form ng-submit="loadMALList()">
-                        <div class="form-row">
-                            <div class="col-12 col-md-9 mb-2 mb-md-0">
-                                <input type="text" class="form-control form-control-lg" placeholder="MAL username" ng-model="usernameInput">
-                            </div>
-                            <div class="col-12 col-md-3">
-                                <button type="submit" class="btn btn-block btn-lg btn-primary">Check my list</button>
-                            </div>
+<header class="text-white text-center">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+                <form ng-submit="loadMALList()">
+                    <div class="form-row">
+                        <div class="col-12 col-md-9 mb-2 mb-md-0">
+                            <input type="text" class="form-control form-control-lg" placeholder="MAL username"
+                                   ng-model="usernameInput">
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div ng-repeat="(key, value) in data.reports">
-        <h1>{{value.description}}</h1>
-        <div class="cards-container">
-            <div class="card card-fixed" ng-repeat="item_id in value.items">
-                <img class="card-img-top card-img-fixed" src="{{imageURLForID(item_id)}}" alt="cover image">
-                <div class="card-body">
-                    <h5 class="card-title">{{titleForID(item_id)}}</h5>
-                </div>
+                        <div class="col-12 col-md-3">
+                            <button type="submit" class="btn btn-block btn-lg btn-primary">Check my list</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</header>
 
-    </body>
+<div class="container main-container" ng-show="data">
+    <div class="reports-summary" ng-show="data.stats">
+        <span>{{data.stats.listSize}} {{entity}} analyzed - {{data.stats.issues}} errors</span>
+    </div>
+
+    <ul class="list-group report-main">
+    <li class="list-group-item" ng-repeat="(key, value) in data.reports">
+        <div class="d-flex justify-content-between align-items-center">
+            <a class="report-title" data-toggle="collapse" href="#report-items-{{key}}" aria-expanded="true" aria-controls="report-items-{{key}}">{{value.description}}</a>
+            <span class="badge badge-primary badge-pill">{{value.items.length}}</span>
+        </div>
+
+        <div class="collapse show report-items" id="report-items-{{key}}">
+            <div class="report-item" ng-repeat="item_id in value.items">
+                <a href="{{linkForID(item_id)}}" class="entity-name">{{titleForID(item_id)}}</a>
+            </div>
+        </div>
+    </li>
+
+    <li class="list-group-item report-extras" ng-repeat="(key, value) in data.extra">
+        <span class="report-extras-item">{{value.description}}</span>
+    </li>
+    </ul>
+</div>
+</body>
 </html>

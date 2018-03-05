@@ -1,9 +1,8 @@
 const Category = Object.freeze({
-    Invalid: 0,
-    Score: 1,
-    Date: 2,
-    Misc: 3,
-    Fun: 4,
+    Invalid: 'invalid',
+    Score: 'scores',
+    Date: 'dates',
+    Misc: 'other',
 });
 
 function Analyzer(user, entity) {
@@ -128,7 +127,7 @@ function Analyzer(user, entity) {
         description: {
             anime: 'You haven\'t watched Clannad. Drop whatever you\'re doing and go watch it'
         },
-        category: Category.Fun,
+        category: Category.Misc,
 
         check: (property) => property
     }
@@ -136,6 +135,8 @@ function Analyzer(user, entity) {
 }
 
 Analyzer.prototype.run = function(list) {
+    this.list = list;
+
     list.forEach((item) => {
         this.inspect(this.entity, item);
     });
@@ -259,6 +260,7 @@ Analyzer.prototype.inspect = function(entity, item) {
 
 Analyzer.prototype.export = function() {
     let data = {};
+    let extra = {};
     let entities = {};
 
     this.exportItems('x_', (content, name, metadata) => {
@@ -270,13 +272,37 @@ Analyzer.prototype.export = function() {
 
     this.exportItems('c_', (content, name, metadata) => {
         if (metadata.check(content)) {
-            data[name] = this.exportStatic(content, name, metadata);
+            extra[name] = this.exportStatic(content, name, metadata);
         }
     });
 
     return {
         reports: data,
+        extra: extra,
+        stats: this.buildStats(data, extra),
         [this.entity]: this.purgeEntities(entities)
+    };
+};
+
+Analyzer.prototype.buildStats = function (data, extra) {
+    let objectLength = (obj) => {
+        let len = 0;
+        for (let property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (obj[property].hasOwnProperty('items')) {
+                    len += obj[property].items.length;
+                }
+                else {
+                    len++;
+                }
+            }
+        }
+        return len;
+    };
+
+    return {
+        listSize: this.list.length,
+        issues: objectLength(data) + objectLength(extra),
     };
 };
 

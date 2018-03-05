@@ -42,4 +42,8 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
     $scope.titleForID = function (id) {
         return $scope.getEntities()[id].title;
     };
+
+    $scope.linkForID = function (id) {
+        return `https://myanimelist.net/${$scope.entity}/${id}`;
+    };
 }]);
