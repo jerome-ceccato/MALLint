@@ -12,11 +12,14 @@ const httpServer = http.createServer(app);
 httpServer.listen(3000);
 console.log('HTTP server started');
 
-if (fs.existsSync('sslcert/server.key')) {
+if (fs.existsSync('sslcert/key')) {
     const https = require('https');
-    const privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
-    const certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
-    const credentials = {key: privateKey, cert: certificate};
+    
+    const credentials = {
+        key: fs.readFileSync('sslcert/key', 'utf8'),
+        cert: fs.readFileSync('sslcert/cert', 'utf8'),
+        ca: fs.readFileSync('sslcert/ca', 'utf8')
+    };
 
     const httpsServer = https.createServer(credentials, app);
     httpsServer.listen(3443);
