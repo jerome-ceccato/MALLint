@@ -61,14 +61,14 @@
 
 <div class="container main-container" ng-show="data">
     <div class="reports-summary" ng-show="data.stats">
-        <span>{{data.stats.listSize}} {{entity}} analyzed - {{data.stats.issues}} errors</span>
+        <span>{{getStats()}}</span>
     </div>
 
     <ul class="list-group report-main">
     <li class="list-group-item" ng-repeat="(key, value) in data.reports">
         <div class="d-flex justify-content-between align-items-center">
             <a class="report-title" data-toggle="collapse" href="#report-items-{{key}}" aria-expanded="true" aria-controls="report-items-{{key}}">{{value.description}}</a>
-            <span class="badge badge-primary badge-pill">{{value.items.length}}</span>
+            <span class="badge badge-{{badgeStyleForCategory(value.category)}} badge-pill">{{value.items.length}}</span>
         </div>
 
         <div class="collapse show report-items" id="report-items-{{key}}">

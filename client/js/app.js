@@ -46,4 +46,36 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
     $scope.linkForID = function (id) {
         return `https://myanimelist.net/${$scope.entity}/${id}`;
     };
+
+    $scope.badgeStyleForCategory = function (category) {
+        switch (category) {
+            case 'error':
+                return 'danger';
+            case 'warning':
+                return 'primary';
+            default:
+                return 'secondary';
+        }
+    };
+
+    $scope.getStats = function () {
+        let message = `${$scope.data.stats.listSize} ${$scope.entity} analyzed`;
+        let stats = $scope.data.stats.issues;
+
+        if (stats.total > 0) {
+            if (stats.error > 0) {
+                let s = stats.error > 1 ? 's' : '';
+                message += ` - ${stats.error} error${s}`
+            }
+            if (stats.warning > 0) {
+                let separator = stats.error > 0 ? ', ' : ' - ';
+                let s = stats.warning > 1 ? 's' : '';
+                message += `${separator}${stats.warning} warning${s}`
+            }
+        }
+        else {
+            message += ' - no problem detected!'
+        }
+        return message;
+    };
 }]);

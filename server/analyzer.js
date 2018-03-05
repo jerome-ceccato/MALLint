@@ -1,7 +1,6 @@
 const Category = Object.freeze({
-    Invalid: 'invalid',
-    Score: 'scores',
-    Date: 'dates',
+    Invalid: 'error',
+    Warning: 'warning',
     Misc: 'other',
 });
 
@@ -64,7 +63,7 @@ function Analyzer(user, entity) {
             anime: 'Completed anime with no score',
             manga: 'Completed manga with no score'
         },
-        category: Category.Score,
+        category: Category.Warning,
     };
 
     // add unpure scores
@@ -77,7 +76,7 @@ function Analyzer(user, entity) {
             anime: 'Started anime with no start date recorded',
             manga: 'Started manga with no start date recorded'
         },
-        category: Category.Date,
+        category: Category.Warning,
     };
 
     this.x_missingEndDate = [];
@@ -86,7 +85,7 @@ function Analyzer(user, entity) {
             anime: 'Completed anime with no end date recorded',
             manga: 'Completed manga with no end date recorded'
         },
-        category: Category.Date,
+        category: Category.Warning,
     };
 
     this.x_invalidStartDate = [];
@@ -95,7 +94,7 @@ function Analyzer(user, entity) {
             anime: 'Plan-to-watch anime with a start date recorded',
             manga: 'Plan-to-read manga with a start date recorded'
         },
-        category: Category.Date,
+        category: Category.Invalid,
     };
 
     this.x_invalidEndDate = [];
@@ -104,7 +103,7 @@ function Analyzer(user, entity) {
             anime: 'Non-completed anime with an end date recorded',
             manga: 'Non-completed manga with an end date recorded'
         },
-        category: Category.Date
+        category: Category.Invalid
     };
 
     ////////// MISC //////////////
@@ -125,7 +124,7 @@ function Analyzer(user, entity) {
     this.c_clannadNotInList = isAnime;
     this.clannadNotInListMeta = {
         description: {
-            anime: 'You haven\'t watched Clannad. Drop whatever you\'re doing and go watch it'
+            anime: 'You haven\'t watched Clannad. Drop whatever you\'re doing and go watch it :)'
         },
         category: Category.Misc,
 
@@ -202,7 +201,7 @@ Analyzer.prototype.inspectAnime = function(item) {
         }
     }
 
-    if (item['title'].toLowerCase().includes('clannad')) {
+    if (item['title'].toLowerCase().includes('clannad') && item[this.myStatus] !== this.statusPlanned) {
         this.c_clannadNotInList = false;
     }
 };
@@ -285,24 +284,33 @@ Analyzer.prototype.export = function() {
 };
 
 Analyzer.prototype.buildStats = function (data, extra) {
-    let objectLength = (obj) => {
-        let len = 0;
+    let issues  = {
+        total: 0,
+        [Category.Invalid]: 0,
+        [Category.Warning]: 0,
+        [Category.Misc]: 0
+    };
+
+    let countIssues = (obj) => {
         for (let property in obj) {
             if (obj.hasOwnProperty(property)) {
+                let total = 1;
                 if (obj[property].hasOwnProperty('items')) {
-                    len += obj[property].items.length;
+                    total = obj[property].items.length;
                 }
-                else {
-                    len++;
-                }
+
+                issues.total += total;
+                issues[obj[property].category] += total;
             }
         }
-        return len;
     };
+
+    countIssues(data);
+    countIssues(extra);
 
     return {
         listSize: this.list.length,
-        issues: objectLength(data) + objectLength(extra),
+        issues: issues,
     };
 };
 
