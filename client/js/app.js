@@ -72,6 +72,11 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
                 let s = stats.warning > 1 ? 's' : '';
                 message += `${separator}${stats.warning} warning${s}`
             }
+            if (stats.suggestion > 0) {
+                let separator = stats.error > 0 || stats.warning > 0 ? ', ' : ' - ';
+                let s = stats.suggestion > 1 ? 's' : '';
+                message += `${separator}${stats.suggestion} suggestion${s}`
+            }
         }
         else {
             message += ' - no problem detected!'

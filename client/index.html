@@ -78,8 +78,17 @@
         </div>
     </li>
 
-    <li class="list-group-item report-extras" ng-repeat="(key, value) in data.extra">
-        <span class="report-extras-item">{{value.description}}</span>
+    <li class="list-group-item report-extras" ng-show="data.stats.issues.suggestion">
+        <div class="d-flex justify-content-between align-items-center">
+            <a class="report-title" data-toggle="collapse" href="#report-items-suggestions" aria-expanded="true" aria-controls="report-items-suggestions">Suggestions</a>
+            <span class="badge badge-{{badgeStyleForCategory('suggestion')}} badge-pill">{{data.stats.issues.suggestion}}</span>
+        </div>
+        <div class="collapse show report-items" id="report-items-suggestions">
+            <div class="report-extras-item" ng-repeat="(key, value) in data.extra">
+                {{value.description}}
+            </div>
+        </div>
+
     </li>
     </ul>
 </div>

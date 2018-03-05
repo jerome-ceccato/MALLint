@@ -1,7 +1,7 @@
 const Category = Object.freeze({
     Invalid: 'error',
     Warning: 'warning',
-    Misc: 'other',
+    Misc: 'suggestion',
 });
 
 function Analyzer(user, entity) {
