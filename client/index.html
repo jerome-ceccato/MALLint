@@ -59,6 +59,11 @@
     </div>
 </header>
 
+<div class="container main-container" ng-show="error">
+    <div class="alert alert-danger" role="alert">
+        {{error}}
+    </div>
+</div>
 <div class="container main-container" ng-show="data">
     <div class="reports-summary alert alert-{{getReportStyle()}}" role="alert" ng-show="data.stats">
         <h4 class="alert-heading">{{getReportGlobalStatus().title}}</h4>

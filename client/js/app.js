@@ -13,6 +13,7 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
 	$scope.loadData = function (entity, username) {
 	    $scope.entity = entity;
 	    $scope.data = null;
+	    $scope.error = null;
 
         Data.get(entity, username).success(resp => {
             if (resp.hasOwnProperty('error')) {
