@@ -83,4 +83,52 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         }
         return message;
     };
+
+    $scope.getReportStyle = function() {
+        let stats = $scope.data.stats.issues;
+
+        if (stats.error > 0) {
+            return 'danger';
+        }
+        else if (stats.warning > 0) {
+            return 'warning';
+        }
+        return 'success';
+    };
+
+    $scope.getReportGlobalStatus = function() {
+        let result = {};
+        let stats = $scope.data.stats.issues;
+
+        if (stats.error > 0) {
+            result.title = 'Oh no! There are some errors in your list';
+        }
+        else if (stats.warning > 0) {
+            result.title = 'No errors were found, but you have some warnings';
+        }
+        else {
+            result.title = 'Well done, your list passes the test!'
+        }
+
+        result.body = '';
+        if (stats.total > 0) {
+            if (stats.error > 0) {
+                let s = stats.error > 1 ? 's' : '';
+                result.body += `${stats.error} error${s} - you should fix these`
+            }
+            if (stats.warning > 0) {
+                let separator = stats.error > 0 ? '\n' : '';
+                let s = stats.warning > 1 ? 's' : '';
+                result.body += `${separator}${stats.warning} warning${s} - you may ignore these depending on your personal preferences`
+            }
+            if (stats.suggestion > 0) {
+                let separator = stats.error > 0 || stats.warning > 0 ? '\n' : '';
+                let s = stats.suggestion > 1 ? 's' : '';
+                result.body += `${separator}${stats.suggestion} suggestion${s} - this is purely subjective`
+            }
+        }
+
+        result.footer = `${$scope.data.stats.listSize} ${$scope.entity} analyzed`;
+        return result;
+    };
 }]);

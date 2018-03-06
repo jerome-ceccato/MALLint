@@ -30,7 +30,7 @@
     <title>MAL health check</title>
 </head>
 
-<body ng-controller="appController" class="container-fluid">
+<body ng-controller="appController">
 
 <nav class="navbar navbar-light bg-light static-top">
     <div class="container">
@@ -60,18 +60,21 @@
 </header>
 
 <div class="container main-container" ng-show="data">
-    <div class="reports-summary" ng-show="data.stats">
-        <span>{{getStats()}}</span>
+    <div class="reports-summary alert alert-{{getReportStyle()}}" role="alert" ng-show="data.stats">
+        <h4 class="alert-heading">{{getReportGlobalStatus().title}}</h4>
+        <p class="angular-with-newlines">{{getReportGlobalStatus().body}}</p>
+        <hr>
+        <p class="mb-0">{{getReportGlobalStatus().footer}}</p>
     </div>
 
     <ul class="list-group report-main">
     <li class="list-group-item" ng-repeat="(key, value) in data.reports">
         <div class="d-flex justify-content-between align-items-center">
-            <a class="report-title" data-toggle="collapse" href="#report-items-{{key}}" aria-expanded="true" aria-controls="report-items-{{key}}">{{value.description}}</a>
+            <a class="report-title" data-toggle="collapse" href="#report-items-{{key}}" aria-expanded="false" aria-controls="report-items-{{key}}">{{value.description}}</a>
             <span class="badge badge-{{badgeStyleForCategory(value.category)}} badge-pill">{{value.items.length}}</span>
         </div>
 
-        <div class="collapse show report-items" id="report-items-{{key}}">
+        <div class="collapse report-items" id="report-items-{{key}}">
             <div class="report-item" ng-repeat="item_id in value.items">
                 <a href="{{linkForID(item_id)}}" class="entity-name">{{titleForID(item_id)}}</a>
             </div>
@@ -80,10 +83,10 @@
 
     <li class="list-group-item report-extras" ng-show="data.stats.issues.suggestion">
         <div class="d-flex justify-content-between align-items-center">
-            <a class="report-title" data-toggle="collapse" href="#report-items-suggestions" aria-expanded="true" aria-controls="report-items-suggestions">Suggestions</a>
+            <a class="report-title" data-toggle="collapse" href="#report-items-suggestions" aria-expanded="false" aria-controls="report-items-suggestions">Suggestions</a>
             <span class="badge badge-{{badgeStyleForCategory('suggestion')}} badge-pill">{{data.stats.issues.suggestion}}</span>
         </div>
-        <div class="collapse show report-items" id="report-items-suggestions">
+        <div class="collapse report-items" id="report-items-suggestions">
             <div class="report-extras-item" ng-repeat="(key, value) in data.extra">
                 {{value.description}}
             </div>

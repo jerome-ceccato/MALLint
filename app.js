@@ -14,7 +14,7 @@ console.log('HTTP server started');
 
 if (fs.existsSync('sslcert/key')) {
     const https = require('https');
-    
+
     const credentials = {
         key: fs.readFileSync('sslcert/key', 'utf8'),
         cert: fs.readFileSync('sslcert/cert', 'utf8'),

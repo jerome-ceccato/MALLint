@@ -17,7 +17,7 @@ function Analyzer(user, entity) {
     this.myEndDate = isAnime ? 'watching_end' : 'reading_end';
     this.myRestarting = isAnime ? 'rewatching' : 'rereading';
 
-    ////////// SANITY //////////////
+    ////////// ERRORS //////////////
 
     this.x_completedWrongMetrics = [];
     this.completedWrongMetricsMeta = {
@@ -25,7 +25,7 @@ function Analyzer(user, entity) {
             anime: 'Completed anime with a wrong number of watched episodes',
             manga: 'Completed manga with a wrong number of read volumes or chapters'
         },
-        category: Category.Invalid,
+        category: Category.Invalid
     };
 
     this.x_invalidMetrics = [];
@@ -34,7 +34,7 @@ function Analyzer(user, entity) {
             anime: 'Anime with more episodes watched than the maximum number',
             manga: 'Manga with more volumes or chapters read than the maximum'
         },
-        category: Category.Invalid,
+        category: Category.Invalid
     };
 
     this.x_metricsInPlanned = [];
@@ -43,7 +43,7 @@ function Analyzer(user, entity) {
             anime: 'Plan-to-watch anime with more than 0 watched episodes',
             manga: 'Plan-to-read manga with more than 0 read volumes or chapters'
         },
-        category: Category.Invalid,
+        category: Category.Invalid
     };
 
     this.x_noMetricsInWatchingReadingOnHold = [];
@@ -52,40 +52,7 @@ function Analyzer(user, entity) {
             anime: 'Watching or On-hold anime with 0 watched episodes',
             manga: 'Reading or On-hold manga with 0 read volumes or chapters'
         },
-        category: Category.Invalid,
-    };
-
-    ////////// SCORES //////////////
-
-    this.x_completedNoScore = [];
-    this.completedNoScoreMeta = {
-        description: {
-            anime: 'Completed anime with no score',
-            manga: 'Completed manga with no score'
-        },
-        category: Category.Warning,
-    };
-
-    // add unpure scores
-
-    ////////// DATES //////////////
-
-    this.x_missingStartDate = [];
-    this.missingStartDateMeta = {
-        description: {
-            anime: 'Started anime with no start date recorded',
-            manga: 'Started manga with no start date recorded'
-        },
-        category: Category.Warning,
-    };
-
-    this.x_missingEndDate = [];
-    this.missingEndDateMeta = {
-        description: {
-            anime: 'Completed anime with no end date recorded',
-            manga: 'Completed manga with no end date recorded'
-        },
-        category: Category.Warning,
+        category: Category.Invalid
     };
 
     this.x_invalidStartDate = [];
@@ -94,19 +61,66 @@ function Analyzer(user, entity) {
             anime: 'Plan-to-watch anime with a start date recorded',
             manga: 'Plan-to-read manga with a start date recorded'
         },
-        category: Category.Invalid,
+        category: Category.Invalid
     };
 
     this.x_invalidEndDate = [];
     this.invalidEndDateMeta = {
         description: {
-            anime: 'Non-completed anime with an end date recorded',
-            manga: 'Non-completed manga with an end date recorded'
+            anime: 'Watching, on-hold or plan-to-watch anime with an end date recorded',
+            manga: 'Reading, on-hold or plan-to-read manga with an end date recorded'
         },
         category: Category.Invalid
     };
 
-    ////////// MISC //////////////
+    ////////// WARNINGS //////////////
+
+    this.x_completedNoScore = [];
+    this.completedNoScoreMeta = {
+        description: {
+            anime: 'Completed anime with no score',
+            manga: 'Completed manga with no score'
+        },
+        category: Category.Warning
+    };
+
+    this.x_scoredDropped = [];
+    this.scoredDroppedMeta = {
+        description: {
+            anime: 'Dropped anime with a score',
+            manga: 'Dropped manga with a score'
+        },
+        category: Category.Warning
+    };
+
+    this.x_missingStartDate = [];
+    this.missingStartDateMeta = {
+        description: {
+            anime: 'Started anime with no start date recorded',
+            manga: 'Started manga with no start date recorded'
+        },
+        category: Category.Warning
+    };
+
+    this.x_missingEndDate = [];
+    this.missingEndDateMeta = {
+        description: {
+            anime: 'Completed anime with no end date recorded',
+            manga: 'Completed manga with no end date recorded'
+        },
+        category: Category.Warning
+    };
+
+    this.x_droppedEndDate = [];
+    this.droppedEndDateMeta = {
+        description: {
+            anime: 'Dropped anime with an end date recorded',
+            manga: 'Dropped manga with an end date recorded'
+        },
+        category: Category.Warning
+    };
+
+    ////////// SUGGESTIONS //////////////
 
     this.c_tooManyWatchingReading = 0;
     this.tooManyWatchingReadingMeta = {
@@ -155,7 +169,12 @@ Analyzer.prototype.inspectEntity = function(item) {
     }
     else {
         if ((this.myEndDate in item) && item[this.myEndDate]) {
-            this.x_invalidEndDate.push(item);
+            if (item[this.myStatus] === 'dropped') {
+                this.x_droppedEndDate.push(item);
+            }
+            else {
+                this.x_invalidEndDate.push(item);
+            }
         }
     }
 
@@ -169,6 +188,12 @@ Analyzer.prototype.inspectEntity = function(item) {
             this.x_missingStartDate.push(item);
         }
 
+    }
+
+    if (item[this.myStatus] === 'dropped') {
+        if (item['score'] !== 0) {
+            this.x_scoredDropped.push(item);
+        }
     }
 
     if (item[this.myStatus] === this.statusWatchRead) {
@@ -336,7 +361,6 @@ Analyzer.prototype.exportCollection = function(items, key, metadata) {
 
 Analyzer.prototype.exportStatic = function (content, key, metadata) {
     return {
-        value: content,
         description: metadata.description[this.entity],
         category: metadata.category,
     };
@@ -363,10 +387,8 @@ Analyzer.prototype.purgeEntity = function (entity) {
 
     let properties = [
         'title',
-        'synonyms',
         'image_url',
         'type',
-        'status',
 
         'episodes',
         'chapters',
