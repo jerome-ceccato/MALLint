@@ -10,43 +10,56 @@ app.factory('fetcher', ['$http', ($http) => {
 
 // App controller
 app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
-	$scope.loadData = function (entity, username) {
-	    $scope.entity = entity;
-	    $scope.data = null;
-	    $scope.error = null;
 
+    $scope.username = null;
+    $scope.data = {};
+    $scope.error = {};
+    $scope.loading = {'anime': false, 'manga': false};
+    $scope.loaded = false;
+
+	$scope.loadData = function (entity, username) {
+	    $scope.loading[entity] = true;
         Data.get(entity, username).success(resp => {
+            $scope.loaded = true;
             if (resp.hasOwnProperty('error')) {
-                $scope.error = resp.error;
-                $scope.data = null;
+                $scope.error[entity] = resp.error;
+                $scope.data[entity] = null;
             }
             else {
-                $scope.error = null;
-                $scope.data = resp
+                $scope.error[entity] = null;
+                $scope.data[entity] = resp
             }
         });
     };
-    
-    $scope.loadMALList = function () {
-        $scope.loadData('anime', $scope.usernameInput);
+
+	$scope.reloadLists = function () {
+        $scope.data = {};
+        $scope.error = {};
+        $scope.loading = {'anime': false, 'manga': false};
+        $scope.loaded = false;
+
+        $scope.username = $scope.usernameInput;
+        $scope.loadMALList('anime');
+    };
+
+    $scope.loadMALList = function (entity) {
+        if (!$scope.loading[entity]) {
+            $scope.loadData(entity, $scope.username);
+        }
     };
 
     // Utils
 
-    $scope.getEntities = function () {
-        return $scope.data[$scope.entity];
+    $scope.getEntities = function (entity) {
+        return $scope.data[entity][entity];
     };
 
-    $scope.imageURLForID = function (id) {
-        return $scope.getEntities()[id].image_url;
+    $scope.titleForID = function (entity, id) {
+        return $scope.getEntities(entity)[id].title;
     };
 
-    $scope.titleForID = function (id) {
-        return $scope.getEntities()[id].title;
-    };
-
-    $scope.linkForID = function (id) {
-        return `https://myanimelist.net/${$scope.entity}/${id}`;
+    $scope.linkForID = function (entity, id) {
+        return `https://myanimelist.net/${entity}/${id}`;
     };
 
     $scope.badgeStyleForCategory = function (category) {
@@ -60,9 +73,9 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         }
     };
 
-    $scope.getStats = function () {
-        let message = `${$scope.data.stats.listSize} ${$scope.entity} analyzed`;
-        let stats = $scope.data.stats.issues;
+    $scope.getStats = function (entity) {
+        let message = `${$scope.data[entity].stats.listSize} ${entity} analyzed`;
+        let stats = $scope.data[entity].stats.issues;
 
         if (stats.total > 0) {
             if (stats.error > 0) {
@@ -86,8 +99,8 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         return message;
     };
 
-    $scope.getReportStyle = function() {
-        let stats = $scope.data.stats.issues;
+    $scope.getReportStyle = function(entity) {
+        let stats = $scope.data[entity].stats.issues;
 
         if (stats.error > 0) {
             return 'danger';
@@ -98,9 +111,10 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         return 'success';
     };
 
-    $scope.getReportGlobalStatus = function() {
+    $scope.getReportGlobalStatus = function(entity) {
         let result = {};
-        let stats = $scope.data.stats.issues;
+        let stats = $scope.data[entity].stats.issues;
+
 
         if (stats.error > 0) {
             result.title = 'Oh no! There are some errors in your list';
@@ -130,7 +144,7 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
             }
         }
 
-        result.footer = `${$scope.data.stats.listSize} ${$scope.entity} analyzed`;
+        result.footer = `${$scope.data[entity].stats.listSize} ${entity} analyzed`;
         return result;
     };
 }]);

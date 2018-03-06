@@ -55,3 +55,8 @@ footer {
 .angular-with-newlines {
     white-space: pre-wrap;
 }
+
+.entity-tabs {
+    width: 50%;
+    text-align: center;
+}
