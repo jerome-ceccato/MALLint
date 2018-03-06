@@ -18,7 +18,11 @@ footer {
 }
 
 .report-items {
-    margin-top: 10px;
+
+}
+
+.report-padding {
+    height: 10px;
 }
 
 .report-title {
