@@ -25,6 +25,10 @@ function Analyzer(user, entity) {
             anime: 'Completed anime with a wrong number of watched episodes',
             manga: 'Completed manga with a wrong number of read volumes or chapters'
         },
+        fix: {
+            anime: 'If you have completed them, you have seen all the episodes. MAL does not show your watched number of episodes on completed anime, so it\'s hard to notice the issue.',
+            manga: 'If you have completed them, you have read all volumes/chapters. MAL does not show your read number of volumes/chapters on completed manga, so it\'s hard to notice the issue.'
+        },
         category: Category.Invalid
     };
 
@@ -33,6 +37,10 @@ function Analyzer(user, entity) {
         description: {
             anime: 'Anime with more episodes watched than the maximum number',
             manga: 'Manga with more volumes or chapters read than the maximum'
+        },
+        fix: {
+            anime: 'This usually happens when MAL splits an anime in two or more. Check the anime listed and their related anime, you might need to add a new one to your list.',
+            manga: 'This usually happens when MAL splits a manga in two or more. Check the manga listed and their related manga, you might need to add a new one to your list.'
         },
         category: Category.Invalid
     };
@@ -43,6 +51,10 @@ function Analyzer(user, entity) {
             anime: 'Plan-to-watch anime with more than 0 watched episodes',
             manga: 'Plan-to-read manga with more than 0 read volumes or chapters'
         },
+        fix: {
+            anime: 'Either you\'ve started them, and they should be moved to watching or on-hold, or you have not, and you should set their watched episodes to 0.',
+            manga: 'Either you\'ve started them, and they should be moved to reading or on-hold, or you have not, and you should set their read volumes/chapters to 0.'
+        },
         category: Category.Invalid
     };
 
@@ -51,6 +63,10 @@ function Analyzer(user, entity) {
         description: {
             anime: 'Watching or On-hold anime with 0 watched episodes',
             manga: 'Reading or On-hold manga with 0 read volumes or chapters'
+        },
+        fix: {
+            anime: 'Either you\'ve started them, and you have watched more than 0 episodes, or you have not, and you should move them to plan-to-watch.',
+            manga: 'Either you\'ve started them, and you have read more than 0 volumes/chapters, or you have not, and you should move them to plan-to-read.'
         },
         category: Category.Invalid
     };
@@ -61,6 +77,10 @@ function Analyzer(user, entity) {
             anime: 'Plan-to-watch anime with a start date recorded',
             manga: 'Plan-to-read manga with a start date recorded'
         },
+        fix: {
+            anime: 'If they are in your plan-to-watch list, it means you haven\'t started them yet. Remove the start date, or move them to watching or on-hold.',
+            manga: 'If they are in your plan-to-read list, it means you haven\'t started them yet. Remove the start date, or move them to reading or on-hold.'
+        },
         category: Category.Invalid
     };
 
@@ -69,6 +89,10 @@ function Analyzer(user, entity) {
         description: {
             anime: 'Watching, on-hold or plan-to-watch anime with an end date recorded',
             manga: 'Reading, on-hold or plan-to-read manga with an end date recorded'
+        },
+        fix: {
+            anime: 'If you haven\'t finished or dropped them, they should not have an end date.',
+            manga: 'If you haven\'t finished or dropped them, they should not have an end date.'
         },
         category: Category.Invalid
     };
@@ -81,6 +105,10 @@ function Analyzer(user, entity) {
             anime: 'Completed anime with no score',
             manga: 'Completed manga with no score'
         },
+        fix: {
+            anime: 'Tell the world what you think about these anime!',
+            manga: 'Tell the world what you think about these manga!'
+        },
         category: Category.Warning
     };
 
@@ -89,6 +117,10 @@ function Analyzer(user, entity) {
         description: {
             anime: 'Dropped anime with a score',
             manga: 'Dropped manga with a score'
+        },
+        fix: {
+            anime: 'Is it fair to rate a dropped anime? Nobody knows.',
+            manga: 'Is it fair to rate a dropped manga? Nobody knows.'
         },
         category: Category.Warning
     };
@@ -99,6 +131,10 @@ function Analyzer(user, entity) {
             anime: 'Started anime with no start date recorded',
             manga: 'Started manga with no start date recorded'
         },
+        fix: {
+            anime: 'It\'s time to think really hard and try to remember when you started watching these.',
+            manga: 'It\'s time to think really hard and try to remember when you started reading these.'
+        },
         category: Category.Warning
     };
 
@@ -107,6 +143,10 @@ function Analyzer(user, entity) {
         description: {
             anime: 'Completed anime with no end date recorded',
             manga: 'Completed manga with no end date recorded'
+        },
+        fix: {
+            anime: 'When did you finish watching these again?',
+            manga: 'When did you finish reading these again?'
         },
         category: Category.Warning
     };
@@ -117,6 +157,10 @@ function Analyzer(user, entity) {
             anime: 'Dropped anime with an end date recorded',
             manga: 'Dropped manga with an end date recorded'
         },
+        fix: {
+            anime: 'Some might say it says "end date", and not "finish date", so you can put an end date on dropped anime. You decide.',
+            manga: 'Some might say it says "end date", and not "finish date", so you can put an end date on dropped manga. You decide.'
+        },
         category: Category.Warning
     };
 
@@ -125,8 +169,8 @@ function Analyzer(user, entity) {
     this.c_tooManyWatchingReading = 0;
     this.tooManyWatchingReadingMeta = {
         description: {
-            anime: 'More than 30 watching anime. Move some in your on-hold list',
-            manga: 'More than 30 reading manga. Move some in your on-hold list'
+            anime: 'More than 30 watching anime. Move some to your on-hold list!',
+            manga: 'More than 30 reading manga. Move some to your on-hold list!'
         },
         category: Category.Misc,
 
@@ -355,6 +399,7 @@ Analyzer.prototype.exportCollection = function(items, key, metadata) {
     return {
         items: items.map(x => x['id']),
         description: metadata.description[this.entity],
+        fix: metadata.fix[this.entity],
         category: metadata.category,
     };
 };

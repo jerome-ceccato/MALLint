@@ -12,6 +12,7 @@ app.factory('fetcher', ['$http', ($http) => {
 app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
 	$scope.loadData = function (entity, username) {
 	    $scope.entity = entity;
+	    $scope.data = null;
 
         Data.get(entity, username).success(resp => {
             if (resp.hasOwnProperty('error')) {
@@ -107,7 +108,7 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
             result.title = 'No errors were found, but you have some warnings';
         }
         else {
-            result.title = 'Well done, your list passes the test!'
+            result.title = 'Well done, your list passes the tests!'
         }
 
         result.body = '';

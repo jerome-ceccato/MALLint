@@ -18,11 +18,10 @@ footer {
 }
 
 .report-items {
-
+    margin-top: 10px;
 }
 
 .report-title {
-    margin-bottom: 10px;
     color: black;
     font-size: large;
 }

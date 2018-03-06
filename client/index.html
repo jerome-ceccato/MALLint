@@ -75,6 +75,7 @@
         </div>
 
         <div class="collapse report-items" id="report-items-{{key}}">
+            <p class="text-muted small">{{value.fix}}</p>
             <div class="report-item" ng-repeat="item_id in value.items">
                 <a href="{{linkForID(item_id)}}" class="entity-name">{{titleForID(item_id)}}</a>
             </div>
