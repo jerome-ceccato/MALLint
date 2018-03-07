@@ -252,6 +252,7 @@ function Analyzer(user, entity) {
 
     ////////// FUN //////////////
 
+    // Disabled
     this.c_clannadNotInList = isAnime;
     this.clannadNotInListMeta = {
         description: {
@@ -259,9 +260,8 @@ function Analyzer(user, entity) {
         },
         category: Category.Misc,
 
-        check: (property) => property
+        check: (property) => false
     }
-
 }
 
 Analyzer.prototype.run = function(list) {
