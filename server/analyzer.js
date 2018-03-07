@@ -1,6 +1,9 @@
+const moment = require('moment');
+
 const Category = Object.freeze({
     Invalid: 'error',
     Warning: 'warning',
+    Info: 'info',
     Misc: 'suggestion',
 });
 
@@ -16,6 +19,9 @@ function Analyzer(user, entity) {
     this.myStartDate = isAnime ? 'watching_start' : 'reading_start';
     this.myEndDate = isAnime ? 'watching_end' : 'reading_end';
     this.myRestarting = isAnime ? 'rewatching' : 'rereading';
+
+    this.entityStatusOngoing = isAnime ? 'currently airing' : 'publishing';
+    this.entityStatusNotYet = isAnime ? 'not yet aired' : 'not yet published';
 
     ////////// ERRORS //////////////
 
@@ -61,8 +67,8 @@ function Analyzer(user, entity) {
     this.x_noMetricsInWatchingReadingOnHold = [];
     this.noMetricsInWatchingReadingOnHoldMeta = {
         description: {
-            anime: 'Watching or On-hold anime with 0 watched episodes',
-            manga: 'Reading or On-hold manga with 0 read volumes or chapters'
+            anime: 'Watching or on-hold anime with 0 watched episodes',
+            manga: 'Reading or on-hold manga with 0 read volumes or chapters'
         },
         fix: {
             anime: 'Either you\'ve started them, and you have watched more than 0 episodes, or you have not, and you should move them to plan-to-watch.',
@@ -93,6 +99,45 @@ function Analyzer(user, entity) {
         fix: {
             anime: 'If you haven\'t finished or dropped them, they should not have an end date.',
             manga: 'If you haven\'t finished or dropped them, they should not have an end date.'
+        },
+        category: Category.Invalid
+    };
+
+    this.x_ongoingCompleted = [];
+    this.ongoingCompletedMeta = {
+        description: {
+            anime: 'Airing anime marked as completed',
+            manga: 'Publishing manga marked as completed'
+        },
+        fix: {
+            anime: 'You can\'t possibly have completed anime that are still airing. Move them back to watching.',
+            manga: 'You can\'t possibly have completed manga that are still publishing. Move them back to reading.'
+        },
+        category: Category.Invalid
+    };
+
+    this.x_notYetStarted = [];
+    this.notYetStartedMeta = {
+        description: {
+            anime: 'Not yet aired anime not in plan-to-watch',
+            manga: 'Not yet published manga not in plan-to-read'
+        },
+        fix: {
+            anime: 'You can\'t possibly have started anime that have not aired yet. Move them back to plan-to-watch.',
+            manga: 'You can\'t possibly have started manga that have not been published yet. Move them back to plan-to-read.'
+        },
+        category: Category.Invalid
+    };
+
+    this.x_endBeforeStart = [];
+    this.endBeforeStartMeta = {
+        description: {
+            anime: 'Anime with an end date prior to the start date',
+            manga: 'Manga with an end date prior to the start date'
+        },
+        fix: {
+            anime: 'Check your dates, you probably didn\'t really finish these anime before you started them.',
+            manga: 'Check your dates, you probably didn\'t really finish these manga before you started them.'
         },
         category: Category.Invalid
     };
@@ -164,6 +209,34 @@ function Analyzer(user, entity) {
         category: Category.Warning
     };
 
+    ////////// INFOS //////////////
+
+    this.x_startedBeforeStart = [];
+    this.startedBeforeStartMeta = {
+        description: {
+            anime: 'Anime started before its airing date',
+            manga: 'Manga started before its publishing date'
+        },
+        fix: {
+            anime: 'You can\'t have started these anime before they started airing. But maybe MAL is wrong on the aired date.',
+            manga: 'You can\'t have started these manga before they started publishing. But maybe MAL is wrong on the published date.'
+        },
+        category: Category.Info
+    };
+
+    this.x_endedBeforeEnd = [];
+    this.endedBeforeEndMeta = {
+        description: {
+            anime: 'Completed anime ended before it finished airing',
+            manga: 'Completed manga ended before it finished publishing'
+        },
+        fix: {
+            anime: 'You can\'t have finished these anime before they finished airing. But maybe MAL is wrong on the aired date.',
+            manga: 'You can\'t have finished these manga before they finished publishing. But maybe MAL is wrong on the published date.'
+        },
+        category: Category.Info
+    };
+
     ////////// SUGGESTIONS //////////////
 
     this.c_tooManyWatchingReading = 0;
@@ -210,6 +283,10 @@ Analyzer.prototype.inspectEntity = function(item) {
         if (!(this.myEndDate in item) || !item[this.myEndDate]) {
             this.x_missingEndDate.push(item);
         }
+
+        if (item['status'] === this.entityStatusOngoing) {
+            this.x_ongoingCompleted.push(item);
+        }
     }
     else {
         if ((this.myEndDate in item) && item[this.myEndDate]) {
@@ -232,6 +309,9 @@ Analyzer.prototype.inspectEntity = function(item) {
             this.x_missingStartDate.push(item);
         }
 
+        if (item['status'] === this.entityStatusNotYet) {
+            this.x_notYetStarted.push(item);
+        }
     }
 
     if (item[this.myStatus] === 'dropped') {
@@ -242,6 +322,30 @@ Analyzer.prototype.inspectEntity = function(item) {
 
     if (item[this.myStatus] === this.statusWatchRead) {
         this.c_tooManyWatchingReading += 1;
+    }
+
+    if ((this.myStartDate in item) && ('start_date' in item)) {
+        if (item[this.myStartDate] < item['start_date']) {
+            if (daysDifference(item[this.myStartDate], item['start_date']) > 2) {
+                this.x_startedBeforeStart.push(item);
+            }
+        }
+    }
+
+    if ((this.myEndDate in item) && ('end_date' in item)) {
+        if (item[this.myEndDate] < item['end_date']) {
+            if (item[this.myStatus] === 'completed') {
+                if (daysDifference(item[this.myEndDate], item['end_date']) > 2) {
+                    this.x_endedBeforeEnd.push(item);
+                }
+            }
+        }
+    }
+
+    if ((this.myStartDate in item) && (this.myEndDate in item)) {
+        if (item[this.myStartDate] > item[this.myEndDate]) {
+            this.x_endBeforeStart.push(item);
+        }
     }
 };
 
@@ -357,6 +461,7 @@ Analyzer.prototype.buildStats = function (data, extra) {
         total: 0,
         [Category.Invalid]: 0,
         [Category.Warning]: 0,
+        [Category.Info]: 0,
         [Category.Misc]: 0
     };
 
@@ -472,5 +577,13 @@ Analyzer.prototype.purgeEntity = function (entity) {
 
     return newEntity;
 };
+
+function daysDifference(a, b) {
+    let da = moment(a);
+    let db = moment(b);
+
+    let diff = Math.abs(db.diff(da, 'days'));
+    return diff;
+}
 
 module.exports = Analyzer;

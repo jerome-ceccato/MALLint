@@ -38,6 +38,13 @@
     </div>
 </nav>
 
+<div class="container">
+<p class="lead top-header">
+    MAL is very permissive and lets you edit your lists in ways that make no sense.<br>
+    You can use this tool to find errors in your lists. Simply enter your username below:
+</p>
+</div>
+
 <header class="text-white text-center">
     <div class="overlay"></div>
     <div class="container">
@@ -50,7 +57,7 @@
                                    ng-model="usernameInput">
                         </div>
                         <div class="col-12 col-md-3">
-                            <button type="submit" class="btn btn-block btn-lg btn-primary">Check my list</button>
+                            <button type="submit" class="btn btn-block btn-lg btn-primary">Check my lists</button>
                         </div>
                     </div>
                 </form>
@@ -68,7 +75,7 @@
             <a class="nav-link" id="manga-tab" data-toggle="tab" href="#manga" role="tab" aria-controls="manga" aria-selected="false" ng-click="loadMALList('manga')">My Manga List</a>
         </li>
     </ul>
-    <div class="report-padding"></div>
+    <div class="nav-padding"></div>
     <div class="tab-content">
         <div class="tab-pane fade show active" id="{{current}}" role="tabpanel" aria-labelledby="{{current}}-tab" ng-repeat="current in ['anime', 'manga']">
             <div class="container main-container" ng-if="error[current]">

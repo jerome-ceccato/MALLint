@@ -29,6 +29,8 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
                 $scope.error[entity] = null;
                 $scope.data[entity] = resp
             }
+
+            //setTimeout(() => $('[data-toggle="tooltip"]').tooltip(), 100);
         });
     };
 
@@ -73,32 +75,6 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         }
     };
 
-    $scope.getStats = function (entity) {
-        let message = `${$scope.data[entity].stats.listSize} ${entity} analyzed`;
-        let stats = $scope.data[entity].stats.issues;
-
-        if (stats.total > 0) {
-            if (stats.error > 0) {
-                let s = stats.error > 1 ? 's' : '';
-                message += ` - ${stats.error} error${s}`
-            }
-            if (stats.warning > 0) {
-                let separator = stats.error > 0 ? ', ' : ' - ';
-                let s = stats.warning > 1 ? 's' : '';
-                message += `${separator}${stats.warning} warning${s}`
-            }
-            if (stats.suggestion > 0) {
-                let separator = stats.error > 0 || stats.warning > 0 ? ', ' : ' - ';
-                let s = stats.suggestion > 1 ? 's' : '';
-                message += `${separator}${stats.suggestion} suggestion${s}`
-            }
-        }
-        else {
-            message += ' - no problem detected!'
-        }
-        return message;
-    };
-
     $scope.getReportStyle = function(entity) {
         let stats = $scope.data[entity].stats.issues;
 
@@ -115,12 +91,11 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         let result = {};
         let stats = $scope.data[entity].stats.issues;
 
-
         if (stats.error > 0) {
             result.title = 'Oh no! There are some errors in your list';
         }
         else if (stats.warning > 0) {
-            result.title = 'No errors were found, but you have some warnings';
+            result.title = 'No errors were found, but you have some suggestions';
         }
         else {
             result.title = 'Well done, your list passes the tests!'
@@ -135,12 +110,17 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
             if (stats.warning > 0) {
                 let separator = stats.error > 0 ? '\n' : '';
                 let s = stats.warning > 1 ? 's' : '';
-                result.body += `${separator}${stats.warning} warning${s} - you may ignore these depending on your personal preferences`
+                result.body += `${separator}${stats.warning} suggestion${s} - you may ignore these depending on your personal preferences`
+            }
+            if (stats.info > 0) {
+                let separator = stats.error > 0 || stats.warning > 0 ? '\n' : '';
+                let s = stats.info > 1 ? 'ies' : 'y';
+                result.body += `${separator}${stats.info} inconsistenc${s} - not sure if MAL is right or if you are`
             }
             if (stats.suggestion > 0) {
-                let separator = stats.error > 0 || stats.warning > 0 ? '\n' : '';
+                let separator = stats.error > 0 || stats.warning > 0 || stats.info > 0 ? '\n' : '';
                 let s = stats.suggestion > 1 ? 's' : '';
-                result.body += `${separator}${stats.suggestion} suggestion${s} - this is purely subjective`
+                result.body += `${separator}${stats.suggestion} other${s} - this is purely subjective`
             }
         }
 
