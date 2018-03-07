@@ -52,16 +52,8 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
 
     // Utils
 
-    $scope.getEntities = function (entity) {
-        return $scope.data[entity][entity];
-    };
-
-    $scope.titleForID = function (entity, id) {
-        return $scope.getEntities(entity)[id].title;
-    };
-
-    $scope.linkForID = function (entity, id) {
-        return `https://myanimelist.net/${entity}/${id}`;
+    $scope.linkForItem = function (entity, item) {
+        return `https://myanimelist.net/${entity}/${item.id}`;
     };
 
     $scope.badgeStyleForCategory = function (category) {

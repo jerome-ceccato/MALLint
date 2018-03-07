@@ -451,8 +451,7 @@ Analyzer.prototype.export = function() {
     return {
         reports: data,
         extra: extra,
-        stats: this.buildStats(data, extra),
-        [this.entity]: this.purgeEntities(entities)
+        stats: this.buildStats(data, extra)
     };
 };
 
@@ -502,7 +501,7 @@ Analyzer.prototype.exportItems = function (indicator, exporter) {
 
 Analyzer.prototype.exportCollection = function(items, key, metadata) {
     return {
-        items: items.map(x => x['id']),
+        items: items.map(x => this.exportEntity(x, metadata)),
         description: metadata.description[this.entity],
         fix: metadata.fix[this.entity],
         category: metadata.category,
@@ -522,68 +521,18 @@ Analyzer.prototype.addNewEntities = function (entities, newItems) {
     });
 };
 
-Analyzer.prototype.purgeEntities = function (entities) {
-    let newEntities = {};
-    for (let property in entities) {
-        if (entities.hasOwnProperty(property)) {
-            newEntities[property] = this.purgeEntity(entities[property]);
-        }
-    }
-    return newEntities;
-};
-
-Analyzer.prototype.purgeEntity = function (entity) {
-    let newEntity = {};
-
-    let properties = [
-        'title',
-        'image_url',
-        'type',
-
-        'episodes',
-        'chapters',
-        'volumes'
-    ];
-
-    let userProperties = [
-        'watched_status',
-        'watched_episodes',
-        'rewatching',
-
-        'read_status',
-        'chapters_read',
-        'volumes_read',
-        'rereading',
-
-        'score',
-        'watching_start',
-        'watching_end',
-        'reading_start',
-        'reading_end'
-    ];
-
-    properties.forEach((property) => {
-        if (entity.hasOwnProperty(property)) {
-            newEntity[property] = entity[property];
-        }
-    });
-
-    newEntity['user'] = {};
-    userProperties.forEach((property) => {
-        if (entity.hasOwnProperty(property)) {
-            newEntity['user'][property] = entity[property];
-        }
-    });
-
-    return newEntity;
+Analyzer.prototype.exportEntity = function (entity, metadata) {
+    return {
+        id: entity.id,
+        title: entity.title
+    };
 };
 
 function daysDifference(a, b) {
     let da = moment(a);
     let db = moment(b);
 
-    let diff = Math.abs(db.diff(da, 'days'));
-    return diff;
+    return Math.abs(db.diff(da, 'days'));
 }
 
 module.exports = Analyzer;
