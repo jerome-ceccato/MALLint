@@ -16,11 +16,14 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
     $scope.error = {};
     $scope.loading = {'anime': false, 'manga': false};
     $scope.loaded = false;
+    $scope.lockLoading = false;
 
 	$scope.loadData = function (entity, username) {
 	    $scope.loading[entity] = true;
+	    $scope.lockLoading = true;
         Data.get(entity, username).success(resp => {
             $scope.loaded = true;
+            $scope.lockLoading = false;
             if (resp.hasOwnProperty('error')) {
                 $scope.error[entity] = resp.error;
                 $scope.data[entity] = null;
@@ -40,12 +43,14 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         $scope.loading = {'anime': false, 'manga': false};
         $scope.loaded = false;
 
-        $scope.username = $scope.usernameInput;
-        $scope.loadMALList('anime');
+        if ($scope.usernameInput) {
+            $scope.username = $scope.usernameInput;
+            $scope.loadMALList('anime');
+        }
     };
 
     $scope.loadMALList = function (entity) {
-        if (!$scope.loading[entity]) {
+        if (!$scope.loading[entity] && !$scope.lockLoading) {
             $scope.loadData(entity, $scope.username);
         }
     };
@@ -117,6 +122,9 @@ app.controller('appController', ['$scope', 'fetcher', ($scope, Data) => {
         }
 
         result.footer = `${$scope.data[entity].stats.listSize} ${entity} analyzed`;
+        if (stats.total > 0) {
+            result.footer += `\nClick on the section names to see the details`
+        }
         return result;
     };
 }]);

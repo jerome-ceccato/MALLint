@@ -5,10 +5,12 @@ function API() {
     this.user = '';
     this.entity = 'anime';
     this.user_list = null;
+    this.logger = null;
 }
 
-API.prototype.run = function(res, params) {
+API.prototype.run = function(res, params, logger) {
     this.res = res;
+    this.logger = logger;
 
     if (!this.validateParams(params)) {
         this.error('invalid parameters')
@@ -16,7 +18,7 @@ API.prototype.run = function(res, params) {
     else {
         this.loadList(() => {
             let analyzer = new (require('./analyzer'))(this.user, this.entity);
-            this.res.json(analyzer.run(this.user_list));
+            this.success(analyzer.run(this.user_list));
         });
     }
 };
@@ -71,8 +73,15 @@ API.prototype.validateParams = function(params) {
     return true;
 };
 
+API.prototype.success = function (data) {
+    this.logger(data);
+    this.res.json(data)
+};
+
 API.prototype.error = function(message) {
-    this.res.json({'error': message});
+    let data = {'error': message};
+    this.logger(data);
+    this.res.json(data);
 };
 
 module.exports = API;
